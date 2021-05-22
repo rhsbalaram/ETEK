@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.reddot {
+  height: 25px;
+  width: 25px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.greendot {
+  height: 25px;
+  width: 25px;
+  background-color: green;
+  border-radius: 50%;
+  display: inline-block;
+}
+</style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+$(document).ready(function(){
+  function ajaxcall() {
+    $.ajax({url: "/tracker/dashboard", success: function(result){
+     var jsondata = JSON.parse(result);
+     var htmltxt ='<tr> <th>Customer</th>  <th>Address</th> <th>Vid</th> <th>Vehicle Reg.No</th> <th>Status</th></tr>';
+     for(var i=0; i< jsondata.length; i++) {
+     var name = jsondata[i].name;
+     var address = jsondata[i].address;
+     var vehdata = jsondata[i].vehicles;
+
+     for (var j=0;j<vehdata.length;j++){
+     var dot = ' <span class="greendot"></span>';
+     if(vehdata[j].status=='disconnected'){
+     dot = ' <span class="reddot"></span>';
+     }
+     htmltxt = htmltxt + '<tr><td>'+name+'</td><td>'+address+'</td><td>'+ vehdata[j].id+'</td><td>'+vehdata[j].regno+'</td><td>'+dot+'</td></tr>';
+     }
+      }
+      $("#customers").html(htmltxt);
+    }
+  });
+}
+ajaxcall();
+setInterval(ajaxcall, 30000);
+
+});
+</script>
+</head>
+<body>
+
+<table id="customers">
+  <tr>
+    <th>Customer</th>
+    <th>Address</th>
+    <th>Vid</th>
+    <th>Vehicle Reg.No</th>
+    <th>Status</th>
+  </tr>
+</table>
+
+</body>
+
+</html>
