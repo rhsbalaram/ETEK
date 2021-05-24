@@ -1,0 +1,254 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eurekaserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eurekaserver
+  template:
+    metadata:
+      labels:
+        app: eurekaserver
+    spec:
+      containers:
+        - name: eurekaserver
+          image: etek_eurekaserver
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8761
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eurekaserver
+spec:
+  selector:
+    app: eurekaserver
+  ports:
+    - port: 8761
+      targetPort: 8761
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: etek_api-gateway
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8000
+          env:
+            - name: EUREKA_URI
+              value: http://eurekaserver:8761/eureka
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+spec:
+  selector:
+    app: api-gateway
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dataservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dataservice
+  template:
+    metadata:
+      labels:
+        app: dataservice
+    spec:
+      containers:
+        - name: dataservice
+          image: etek_dataservice
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8093
+          env:
+            - name: EUREKA_URI
+              value: http://eurekaserver:8761/eureka
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dataservice
+spec:
+  selector:
+    app: dataservice
+  ports:
+    - port: 8093
+      targetPort: 8093
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traceservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traceservice
+  template:
+    metadata:
+      labels:
+        app: traceservice
+    spec:
+      containers:
+        - name: traceservice
+          image: etek_traceservice
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8091
+          env:
+            - name: EUREKA_URI
+              value: http://eurekaserver:8761/eureka
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traceservice
+spec:
+  selector:
+    app: traceservice
+  ports:
+    - port: 8091
+      targetPort: 8091
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracker
+  template:
+    metadata:
+      labels:
+        app: tracker
+    spec:
+      containers:
+        - name: tracker
+          image: etek_tracker
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8092
+          env:
+            - name: EUREKA_URI
+              value: http://eurekaserver:8761/eureka
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracker
+spec:
+  selector:
+    app: tracker
+  ports:
+    - port: 8092
+      targetPort: 8092
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicle-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicle-service
+  template:
+    metadata:
+      labels:
+        app: vehicle-service
+    spec:
+      containers:
+        - name: vehicle-service
+          image: etek_vehicle-service
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "250m"
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8090
+          env:
+            - name: EUREKA_URI
+              value: http://eurekaserver:8761/eureka
+          imagePullPolicy: Never
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicle-service
+spec:
+  selector:
+    app: vehicle-service
+  ports:
+    - port: 8090
+      targetPort: 8090
+  type: LoadBalancer

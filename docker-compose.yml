@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: ./Dockerfile
+
+  dataservice:
+    build:
+      context: ./dataservice
+      dockerfile: ./Dockerfile
+  eurekaserver:
+    build:
+      context: ./eurekaserver
+      dockerfile: ./Dockerfile
+
+  traceservice:
+    build:
+      context: ./traceservice
+      dockerfile: ./Dockerfile
+  tracker:
+    build:
+      context: ./tracker
+      dockerfile: ./Dockerfile
+
+  vehicle-service:
+    build:
+      context: ./vehicle-service
+      dockerfile: ./Dockerfile

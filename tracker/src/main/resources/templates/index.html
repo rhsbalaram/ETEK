@@ -12,7 +12,10 @@
   border: 1px solid #ddd;
   padding: 8px;
 }
-
+.a {
+  display: inline;
+  margin-left: 20px
+}
 #customers tr:nth-child(even){background-color: #f2f2f2;}
 
 #customers tr:hover {background-color: #ddd;}
@@ -44,12 +47,19 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
 $(document).ready(function(){
+var custdown ='';
   function ajaxcall() {
+       var custname = $( "#cus" ).val();
+        var vehstatus = $( "#status" ).val();
+
     $.ajax({url: "/tracker/dashboard", success: function(result){
      var jsondata = JSON.parse(result);
      var htmltxt ='<tr> <th>Customer</th>  <th>Address</th> <th>Vid</th> <th>Vehicle Reg.No</th> <th>Status</th></tr>';
+     custdown = '<option value="" selected disabled>Select name</option>';
+
      for(var i=0; i< jsondata.length; i++) {
      var name = jsondata[i].name;
+     custdown = custdown + '<option value="'+name+'"  >'+name+'</option>';
      var address = jsondata[i].address;
      var vehdata = jsondata[i].vehicles;
 
@@ -58,16 +68,31 @@ $(document).ready(function(){
      if(vehdata[j].status=='disconnected'){
      dot = ' <span class="reddot"></span>';
      }
+     if((name ==custname || custname==''||custname==null) && (vehdata[j].status ==vehstatus || vehstatus==''||vehstatus==null)){
      htmltxt = htmltxt + '<tr><td>'+name+'</td><td>'+address+'</td><td>'+ vehdata[j].id+'</td><td>'+vehdata[j].regno+'</td><td>'+dot+'</td></tr>';
+        }
      }
       }
       $("#customers").html(htmltxt);
     }
   });
 }
+
 ajaxcall();
 setInterval(ajaxcall, 30000);
+setTimeout(function(){
+      $("#cus").html(custdown);
+},1000);
 
+$( "#submit" ).click(function() {
+
+ajaxcall();
+});
+$( "#reset" ).click(function() {
+ $( "#cus" ).val("");
+  $( "#status" ).val("");
+ajaxcall();
+});
 });
 </script>
 </head>
@@ -82,7 +107,17 @@ setInterval(ajaxcall, 30000);
     <th>Status</th>
   </tr>
 </table>
-
+</br></br>
+Customer name: <select name="subject" id="cus" class="a">
+  <option value="" selected disabled>Select name</option>
+</select>
+<span class="a">Status: <select name="topic" id="status" class="a">
+    <option value="" selected disabled>Select Status</option>
+  <option value="connected" >connected</option>
+  <option value="disconnected" >disconnected</option>
+  </select>
+  <input type="button" value="Submit" class="a" id="submit">
+  <input type="button" value="Reset" class="a" id="reset">
 </body>
 
 </html>
